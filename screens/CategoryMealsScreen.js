@@ -1,38 +1,51 @@
-import React from 'react';
-import { View, Text, StyleSheet, Button } from 'react-native';
+import React from "react";
+import { View, Text, StyleSheet, FlatList } from "react-native";
 
-import { CATEGORIES } from '../data/dummy-data';
+import { CATEGORIES } from "../data/dummy-data";
+import { MEALS } from "../data/dummy-data";
+import MealItem from "../components/MealItem";
 
 const CategoryMealScreen = props => {
   const { navigation } = props;
-  const catId = navigation.getParam('categoryId');
 
-  const selectedCategory = CATEGORIES.find(cat => cat.id === catId);
+  const renderMealItem = itemData => {
+    return (
+      <MealItem
+        title={itemData.item.title}
+        duration={itemData.item.duration}
+        image={itemData.item.imageUrl}
+        onSelectMeal={() => {
+          navigation.navigate({
+            routeName: "MealDetail",
+            params: {
+              mealId: itemData.item.id
+            }
+          });
+        }}
+        complexity={itemData.item.complexity}
+        affordability={itemData.item.affordability}
+      />
+    );
+  };
+
+  const catId = navigation.getParam("categoryId");
+
+  const displayedMeals = MEALS.filter(meal => meal.categoryIds.includes(catId));
 
   return (
     <View style={styles.screen}>
-      <Text>The Category Meals Screen</Text>
-      <Text>{selectedCategory.title}</Text>
-      <Button
-        title='Go to Meal Detail!'
-        onPress={() => {
-          navigation.navigate('MealDetail');
-        }}
-      />
-      <Button
-        title='Go Back'
-        onPress={() => {
-          navigation.goBack();
-          // pop is used only in stacknavigator
-          // navigation.pop();
-        }}
+      <FlatList
+        data={displayedMeals}
+        keyExtractor={(item, index) => item.id}
+        renderItem={renderMealItem}
+        style={{ width: "100%" }}
       />
     </View>
   );
 };
 
-CategoryMealScreen.navigationOptions = (navigationData) => {
-  const catId = navigationData.navigation.getParam('categoryId');
+CategoryMealScreen.navigationOptions = navigationData => {
+  const catId = navigationData.navigation.getParam("categoryId");
 
   const selectedCategory = CATEGORIES.find(cat => cat.id === catId);
 
@@ -44,8 +57,8 @@ CategoryMealScreen.navigationOptions = (navigationData) => {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center'
+    justifyContent: "center",
+    alignItems: "center"
   }
 });
 
